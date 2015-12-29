@@ -114,8 +114,8 @@ public class RpmSignPlugin extends Recorder {
             Launcher.ProcStarter ps = launcher.new ProcStarter();
             ps = ps.cmds(expectCommand).stdout(listener);
             ps = ps.pwd(build.getWorkspace()).envs(build.getEnvironment(listener));
-
-            byte[] expectScript = createExpectScriptFile(rpmCommandLine, gpgKey.getPassphrase().getPlainText());
+            
+            byte[] expectScript = createExpectScriptFile(rpmCommandLine, gpgKey.getPassphrase().getPlainText(), rpmEntry.getExpectTimeout());
             ByteArrayInputStream is = new ByteArrayInputStream(expectScript);
             ps.stdin(is);
 
@@ -136,12 +136,15 @@ public class RpmSignPlugin extends Recorder {
     return true;
   }
 
-  private byte[] createExpectScriptFile(String signCommand, String passphrase)
+  private byte[] createExpectScriptFile(String signCommand, String passphrase, Integer expectTimeout)
       throws IOException {
     final ByteArrayOutputStream baos = new ByteArrayOutputStream(512);
 
     final PrintWriter writer = new PrintWriter(new OutputStreamWriter(baos));
     try {
+      writer.println("#!/usr/bin/expect  --");
+      writer.print("set timeout ");
+      writer.println(expectTimeout);
       writer.print("spawn ");
       writer.println(signCommand);
       writer.println("expect {");
@@ -149,11 +152,11 @@ public class RpmSignPlugin extends Recorder {
       writer.print(passphrase);
       writer.println("\r\"; log_user 1; }");
       writer.println("eof { catch wait rc; exit [lindex $rc 3]; }");
-      writer.println("timeout { close; exit; }");
+      writer.println("timeout { close; puts \"Timeout while entering the password ...\"; exit 1; }");
       writer.println("}");
       writer.println("expect {");
       writer.println("eof { catch wait rc; exit [lindex $rc 3]; }");
-      writer.println("timeout close");
+      writer.println("timeout { close; puts \"Timeout while signing RPMs ...\"; exit 1; }");
       writer.println("}");
       writer.println();
 
