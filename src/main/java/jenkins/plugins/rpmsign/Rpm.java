@@ -10,13 +10,15 @@ public class Rpm extends AbstractDescribableImpl<Rpm> {
   private final String includes;
   private final String cmdlineOpts;
   private final boolean resign;
+  private final int expectTimeout;
 
   @DataBoundConstructor
-  public Rpm(String gpgKeyName, String includes, String cmdlineOpts, boolean resign) {
+  public Rpm(String gpgKeyName, String includes, String cmdlineOpts, boolean resign, int expectTimeout) {
     this.gpgKeyName = gpgKeyName;
     this.includes = includes;
     this.resign = resign;
     this.cmdlineOpts = cmdlineOpts;
+    this.expectTimeout = expectTimeout;
   }
 
   public String getGpgKeyName() {
@@ -35,6 +37,10 @@ public class Rpm extends AbstractDescribableImpl<Rpm> {
     return resign;
   }
 
+  public Integer getExpectTimeout() {
+    return expectTimeout;
+  }
+ 
   @Extension
   public static class DescriptorImpl extends Descriptor<Rpm> {
     @Override
