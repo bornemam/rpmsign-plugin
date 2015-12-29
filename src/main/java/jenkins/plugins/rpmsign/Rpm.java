@@ -10,10 +10,10 @@ public class Rpm extends AbstractDescribableImpl<Rpm> {
   private final String includes;
   private final String cmdlineOpts;
   private final boolean resign;
-  private final int expectTimeout;
+  private final Integer expectTimeout;
 
   @DataBoundConstructor
-  public Rpm(String gpgKeyName, String includes, String cmdlineOpts, boolean resign, int expectTimeout) {
+  public Rpm(String gpgKeyName, String includes, String cmdlineOpts, boolean resign, Integer expectTimeout) {
     this.gpgKeyName = gpgKeyName;
     this.includes = includes;
     this.resign = resign;
